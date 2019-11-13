@@ -23,8 +23,8 @@ export default class ProductList extends Component {
       <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={[styles.headerText, globalStyles.bold]}> My items </Text>
-        <TouchableHighlight style={styles.button}>
-            <Icon name="three-dots" size={30} color="white"></Icon>
+        <TouchableHighlight style={styles.button} onPress={() => {alert('hehe')}}>
+            <Icon name="settings" size={33} color="white"></Icon>
         </TouchableHighlight>
       </View>
         <ScrollView style={[styles.container, styles.padding]}>
@@ -70,20 +70,12 @@ const styles = StyleSheet.create({
   },
   button: {
       backgroundColor: '#0058a3',
-      height: 25,
-      width: 50,
-      paddingBottom: 20,
-      paddingTop: 10,
-      paddingRight: 80,
-      margin: 25,
+      height: 40,
+      paddingTop: 0,
+      paddingRight: 10,
+      paddingLeft: 10,
+      margin: 20,
       alignItems: 'center',
       justifyContent: 'center',
-  },
-  buttonInterior: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 45,
-
-
   },
 });

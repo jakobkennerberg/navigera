@@ -10,6 +10,7 @@ import CONSTANTS from "./components/Constants.js";
 import PopUpProduct from "./components/PopUpProduct";
 import { GetProduct } from "./utilities.js";
 import SearchPage from "./components/SearchPage";
+import Swiper from 'react-native-swiper';
 
 class CameraScreen extends React.Component {
 	constructor(props) {
@@ -43,74 +44,86 @@ class CameraScreen extends React.Component {
 		const { addItemCallback } = this.props.screenProps;
 
 		return (
+			<Swiper 
+        		horizontal={false} 
+       			showsButtons={false}
+				loop={false}
+				showsPagination={false}   
+        		onMomentumScrollEnd={() => {
+          			alert('End of scrolling')
+       			 }}>
+				<View style={styles.container}>
+					<PopUpProduct style={styles.modal} addItemCallback={addItemCallback} modalCloseCallback={this.modalClosed} ref={modal => { this.modal = modal }}></PopUpProduct>
+					<RNCamera
+						ref={ref => {
+							this.camera = ref;
+						}}
+						captureAudio={false}
+						style={styles.preview}
+						cropScanArea={[1, 1]}
+						type={RNCamera.Constants.Type.back}
+						androidCameraPermissionOptions={{
+							title: "Permission to use camera",
+							message: "We need your permission to use your camera",
+							buttonPositive: "Ok",
+							buttonNegative: "Cancel"
+						}}
+						androidRecordAudioPermissionOptions={{
+							title: "Permission to use audio recording",
+							message: "We need your permission to use your audio",
+							buttonPositive: "Ok",
+							buttonNegative: "Cancel"
+						}}
+						onTextRecognized={async (data) => {
+							if (!this.state.modalVisible) {
+								temp = data.textBlocks;
 
-			<View style={styles.container}>
-				<PopUpProduct style={styles.modal} addItemCallback={addItemCallback} modalCloseCallback={this.modalClosed} ref={modal => { this.modal = modal }}></PopUpProduct>
-				<RNCamera
-					ref={ref => {
-						this.camera = ref;
-					}}
-					captureAudio={false}
-					style={styles.preview}
-					cropScanArea={[1, 1]}
-					type={RNCamera.Constants.Type.back}
-					androidCameraPermissionOptions={{
-						title: "Permission to use camera",
-						message: "We need your permission to use your camera",
-						buttonPositive: "Ok",
-						buttonNegative: "Cancel"
-					}}
-					androidRecordAudioPermissionOptions={{
-						title: "Permission to use audio recording",
-						message: "We need your permission to use your audio",
-						buttonPositive: "Ok",
-						buttonNegative: "Cancel"
-					}}
-					onTextRecognized={async (data) => {
-						if (!this.state.modalVisible) {
-							temp = data.textBlocks;
+								if (typeof temp !== "undefined") {
+									for (let i = 0; i < temp.length; i++) {
+										if (
+											temp[i].value.length ==
+											CONSTANTS.SERIAL_LENGTH
+										) {
+											var possibleSerial = temp[i].value;
+											if (CONSTANTS.REGEX.test(possibleSerial)) {
 
-							if (typeof temp !== "undefined") {
-								for (let i = 0; i < temp.length; i++) {
-									if (
-										temp[i].value.length ==
-										CONSTANTS.SERIAL_LENGTH
-									) {
-										var possibleSerial = temp[i].value;
-										if (CONSTANTS.REGEX.test(possibleSerial)) {
-
-											let product = await GetProduct(possibleSerial);
-											if (product) {
-												this.camera.pausePreview();
-												this.setState({ item: product });
-												if (!this.state.modalVisible) {
-													Vibration.vibrate(200);
+												let product = await GetProduct(possibleSerial);
+												if (product) {
+													this.camera.pausePreview();
+													this.setState({ item: product });
+													if (!this.state.modalVisible) {
+														Vibration.vibrate(200);
+													}
+													this.modal.showPopover(product);
+													this.setState({ modalVisible: true });
+													console.log('camera opened popup');
 												}
-												this.modal.showPopover(product);
-												this.setState({ modalVisible: true });
-												console.log('camera opened popup');
+												//Obviously will not alert, but rather send value elsewhere.
 											}
-											//Obviously will not alert, but rather send value elsewhere.
 										}
 									}
 								}
 							}
-						}
-					}}
-				>
+						}}
+					>
 
-					<View style={styles.maskOuter}>
-						<SearchPage addItemCallback={addItemCallback} pausePreview = {this.searchFocused} modalCloseCallback = {this.modalClosed}> </SearchPage>
-						<View style={[{ flex: maskRowHeight }, styles.maskRow, styles.maskFrame]} />
-						<View style={[{ flex: 6 }, styles.maskCenter]}>
-							<View style={[{ width: maskColWidth }, styles.maskFrame]} />
-							<View style={styles.maskInner} />
-							<View style={[{ width: maskColWidth }, styles.maskFrame]} />
+						<View style={styles.maskOuter}>
+							<SearchPage addItemCallback={addItemCallback} pausePreview = {this.searchFocused} modalCloseCallback = {this.modalClosed}> </SearchPage>
+							<View style={[{ flex: maskRowHeight }, styles.maskRow, styles.maskFrame]} />
+							<View style={[{ flex: 6 }, styles.maskCenter]}>
+								<View style={[{ width: maskColWidth }, styles.maskFrame]} />
+								<View style={styles.maskInner} />
+								<View style={[{ width: maskColWidth }, styles.maskFrame]} />
+							</View>
+							<View style={[{ flex: maskRowHeight }, styles.maskRow, styles.maskFrame]} />
 						</View>
-						<View style={[{ flex: maskRowHeight }, styles.maskRow, styles.maskFrame]} />
-					</View>
-				</RNCamera>
-			</View >
+					</RNCamera>
+				</View >
+
+				<View style={{flex: 1}}>
+					<SearchPage/>
+				</View>
+			</Swiper>
 		);
 	}
 }

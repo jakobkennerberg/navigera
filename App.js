@@ -110,7 +110,7 @@ const AppTabNavigator = createMaterialTopTabNavigator({
 	// 	navigationOptions: {
 	// 		tabBarLabel: 'Map',
 	// 		tabBarIcon: ({ tintColor }) => (
-	// 			<Icon name="store-24" size={30} color={tintColor} />
+	// 			<Icon name="store" size={30} color={tintColor} />
 	// 		)
 	// 	}
 	// },
